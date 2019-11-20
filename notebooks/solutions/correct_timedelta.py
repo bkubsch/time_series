@@ -61,9 +61,50 @@ def lag_horizon(df, lag, horizon):
     horizon=integer of how far into the future the model shall predict; horizon=0 means prediciton 1 step into future
     '''
     for i in range(1,lag+1):
-        df['lag{}'.format(i)] = df['t CO2-e / MWh'].shift(i)
+        df[f'lag{i}'] = df['t CO2-e / MWh'].shift(i)
     
     for i in range(1,horizon+2):
-        df['horizon{}'.format(i-1)] = df['t CO2-e / MWh'][lag+i:].shift(-i+1)
+        df[f'horizon{i-1}'] = df['t CO2-e / MWh'][lag+i:].shift(-i+1)
         
     return df
+
+#lecture 4
+#exercise_1
+def train_test_ts(df, relative_train, maximal_lag, horizon):
+    '''
+    Time series (ts) split function creates a train/test set under consideration of potential overlap between the two due to lag processing
+    X_train, y_train, X_test, y_test = ...
+    df=must contain target column as "target"; all other columns must be used as features
+    percentage_train=how much of the total dataset shall be used for training; must be added between 0 - 1
+    maximal_lag=out of all lag feature engineering, enter the maximal lag number
+    '''
+    k = int(df.shape[0] * relative_train)
+    data_train = df.iloc[:k,:]
+    #to avoid overlapping of train and test data, a gap of the maximal lag - 1 must be included between the two sets
+    data_test = df.iloc[k+maximal_lag:,:]
+    
+    assert data_train.index.max() < data_test.index.min()
+    
+    #returns in the sequence X_train, y_train, X_test, y_test
+    return (data_train.drop(columns=[f"horizon{horizon}","t CO2-e / MWh"], axis=1), data_train[f"horizon{horizon}"],
+            data_test.drop(columns=[f"horizon{horizon}","t CO2-e / MWh"], axis=1), data_test[f"horizon{horizon}"])
+
+#lecture_6
+def errors(model, X_train, y_train, X_test, y_test):
+
+    train_mae = (sum(abs(y_train - model.predict(X_train)))/len(y_train))
+    train_mape = (sum(abs((y_train - model.predict(X_train))/y_train)))*(100/len(y_train))
+    train_smape = sum(abs(y_train - model.predict(X_train)))/sum(y_train + model.predict(X_train))
+
+    test_mae = (sum(abs(y_test - model.predict(X_test)))/len(y_test))
+    test_mape = (sum(abs((y_test - model.predict(X_test))/y_test)))*(100/len(y_test))
+    test_smape = sum(abs(y_test - model.predict(X_test)))/sum(y_test + model.predict(X_test))
+
+    print(f'train_MAE: {train_mae}')
+    print(f'test_MAE: {test_mae}')
+    
+    print(f'train_MAPE: {train_mape}')
+    print(f'test_MAPE: {test_mape}')
+    
+    print(f'train_SMAPE: {train_smape}')
+    print(f'test_SMAPE: {test_smape}')
