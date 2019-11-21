@@ -89,7 +89,9 @@ def train_test_ts(df, relative_train, maximal_lag, horizon):
     return (data_train.drop(columns=[f"horizon{horizon}","t CO2-e / MWh"], axis=1), data_train[f"horizon{horizon}"],
             data_test.drop(columns=[f"horizon{horizon}","t CO2-e / MWh"], axis=1), data_test[f"horizon{horizon}"])
 
-#lecture_6
+
+#lecture_5
+#Exercise_1
 def errors(model, X_train, y_train, X_test, y_test):
 
     train_mae = (sum(abs(y_train - model.predict(X_train)))/len(y_train))
@@ -108,3 +110,63 @@ def errors(model, X_train, y_train, X_test, y_test):
     
     print(f'train_SMAPE: {train_smape}')
     print(f'test_SMAPE: {test_smape}')
+    
+#Exercise_2
+plt.figure(figsize=(7,5))
+plt.style.use('ggplot')
+
+fig = plt.plot_date(y_validation.index[300:600],y_validation.iloc[300:600], linestyle='solid', marker=None, label="test", color='darkblue')
+fig = plt.plot_date(y_validation.index[300:600],model.predict(X_validation)[300:600], linestyle='solid', marker=None, color='darkorange', label="pred")
+plt.legend(fontsize=15)
+
+plt.xlabel("Time of Day", labelpad=15, fontsize=15, fontweight='bold')
+plt.ylabel("t CO2-e / MWh", labelpad=15, fontsize=15, fontweight='bold')
+
+date_format = mdates.DateFormatter('%H:%M')
+plt.gca().xaxis.set_major_formatter(date_format)
+
+plt.style.use('seaborn')
+
+
+
+plt.figure(figsize=(7,5))
+plt.style.use('ggplot')
+
+fig = plt.plot_date(y_validation.index[425:450],y_validation.iloc[425:450], linestyle='solid', marker=None, label="test", color='darkblue')
+fig = plt.plot_date(y_validation.index[425:450],model.predict(X_validation)[425:450], linestyle='solid', marker=None, color='darkorange', label="pred")
+plt.legend(fontsize=15)
+
+plt.xlabel("Time of Day", labelpad=15, fontsize=15, fontweight='bold')
+plt.ylabel("t CO2-e / MWh", labelpad=15, fontsize=15, fontweight='bold')
+
+date_format = mdates.DateFormatter('%H:%M')
+plt.gca().xaxis.set_major_formatter(date_format)
+
+plt.style.use('seaborn')
+
+#Exercise_3
+X_train, y_train, X_validation, y_validation = train_test_ts(
+    df=df,
+    relative_train=0.8,
+    maximal_lag=12,
+    horizon=0)
+
+print(df.columns)
+
+print(X_train.index.max())
+print(X_validation.index.min())
+
+assert X_train.index.max() < X_validation.index.min()
+
+model = xgb.XGBRegressor(max_depth=5,
+                         learning_rate=0.1,
+                         num_estimators=100,
+                         n_jobs=3,
+                         reg_alpha=0.05,
+                         reg_lambda=0,
+                        )
+
+model.fit(X_train, y_train)
+joblib.dump(model, '../model_all_features.pkl')
+
+errors(model, X_train, y_train, X_validation, y_validation)
