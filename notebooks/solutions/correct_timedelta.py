@@ -38,16 +38,16 @@ def time_columns(df):
     df['month'] = df.index.month
     df['year'] = df.index.year
 
-    df['minute_sin'] = np.sin(2 * np.pi * df.loc[:,'minute']/60.0)
-    df['minute_cos'] = np.cos(2 * np.pi * df.loc[:,'minute']/60.0)
+    df['minute_sin'] = np.sin(2 * np.pi * df.loc[:,'minute']/60)
+    df['minute_cos'] = np.cos(2 * np.pi * df.loc[:,'minute']/60)
 
-    df['hour_sin'] = np.sin(2 * np.pi * df.loc[:,'hour']/24.0)
-    df['hour_cos'] = np.cos(2 * np.pi * df.loc[:,'hour']/24.0)
+    df['hour_sin'] = np.sin(2 * np.pi * df.loc[:,'hour']/24)
+    df['hour_cos'] = np.cos(2 * np.pi * df.loc[:,'hour']/24)
     
-    df['weekday_sin'] = np.sin(2 * np.pi * df.loc[:,'weekday']/7.0)
+    df['weekday_sin'] = np.sin(2 * np.pi * df.loc[:,'weekday']/6)
     
-    df['month_sin'] = np.sin(2 * np.pi * df.loc[:,'month']/12.0)
-    df['month_cos'] = np.cos(2 * np.pi * df.loc[:,'month']/12.0)
+    df['month_sin'] = np.sin(2 * np.pi * df.loc[:,'month']/11)
+    df['month_cos'] = np.cos(2 * np.pi * df.loc[:,'month']/11)
     
     df.drop(columns=['minute', 'weekday', 'hour', 'month'], inplace=True)
     
@@ -64,13 +64,13 @@ def lag_horizon(df, lag, horizon):
         df[f'lag{i}'] = df['t CO2-e / MWh'].shift(i)
     
     for i in range(1,horizon+2):
-        df[f'horizon{i-1}'] = df['t CO2-e / MWh'][lag+i:].shift(-i+1)
+        df[f'horizon{i-1}'] = df['t CO2-e / MWh'][lag:]
         
     return df
 
 #lecture 4
 #exercise_1
-def train_test_ts(df, relative_train, maximal_lag, horizon):
+def train_validation_ts(df, relative_train, maximal_lag, horizon):
     '''
     Time series (ts) split function creates a train/test set under consideration of potential overlap between the two due to lag processing
     X_train, y_train, X_test, y_test = ...
