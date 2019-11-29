@@ -44,12 +44,10 @@ def time_columns(df):
     df['hour_sin'] = np.sin(2 * np.pi * df.loc[:,'hour']/24)
     df['hour_cos'] = np.cos(2 * np.pi * df.loc[:,'hour']/24)
     
-    df['weekday_sin'] = np.sin(2 * np.pi * df.loc[:,'weekday']/6)
+    df['month_sin'] = np.sin(2 * np.pi * df.loc[:,'month']/12)
+    df['month_cos'] = np.cos(2 * np.pi * df.loc[:,'month']/12)
     
-    df['month_sin'] = np.sin(2 * np.pi * df.loc[:,'month']/11)
-    df['month_cos'] = np.cos(2 * np.pi * df.loc[:,'month']/11)
-    
-    df.drop(columns=['minute', 'weekday', 'hour', 'month'], inplace=True)
+    df.drop(columns=['minute', 'hour', 'month'], inplace=True)
     
     return df
 
