@@ -1,10 +1,19 @@
-#Lecture_1
-#Task1
+##notebook_01
+#Exercise1
 df.DateTime = pd.to_datetime(df.DateTime)
 df.set_index('DateTime', inplace = True, drop = True)
 
 
-#Task2
+#Exercise2
+
+#1
+def gap_finder(df, minutes):
+    df['orig_timestamp'] = df.index
+    df['shift_timestamp'] = df.orig_timestamp.shift(periods=1)
+    df['timedelta'] = df.orig_timestamp - df.shift_timestamp
+    return df.loc[df.timedelta > pd.to_timedelta(minutes, unit='m')]['timedelta']
+
+#2
 def correct_timedelta(df, time_diff):
     '''
     df.index must be DateTimeIndex
@@ -24,12 +33,12 @@ def correct_timedelta(df, time_diff):
             
     return lst_1, lst_2
 
-#Task3
+#Exercise3
 new_time_range = pd.date_range(start=df.index.min(), end=df.index.max(), freq="5min")
 len(new_time_range)
 
-#lecture_3
-#exercise_1
+##notebook_03
+#Exercise1
 def time_columns(df):
     
     df.loc[:,'minute'] = df.index.minute
@@ -51,7 +60,7 @@ def time_columns(df):
     
     return df
 
-#exercise_2
+#Exercise2
 def lag_horizon(df, lag, horizon):
     '''
     Returns dataset with additional features defined by lag and modified target defined by horizon
@@ -66,8 +75,8 @@ def lag_horizon(df, lag, horizon):
         
     return df
 
-#lecture 4
-#exercise_1
+#notebook_04
+#Exercise_1
 def train_validation_ts(df, relative_train, maximal_lag, horizon):
     '''
     Time series (ts) split function creates a train/test set under consideration of potential overlap between the two due to lag processing
@@ -88,7 +97,7 @@ def train_validation_ts(df, relative_train, maximal_lag, horizon):
             data_test.drop(columns=[f"horizon{horizon}","t CO2-e / MWh"], axis=1), data_test[f"horizon{horizon}"])
 
 
-#lecture_5
+#notebook_05
 #Exercise_1
 def errors(model, X_train, y_train, X_test, y_test):
 
